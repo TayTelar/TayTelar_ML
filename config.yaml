@@ -1,0 +1,12 @@
+#Data
+path: C:\Users\ADMIN\Downloads\PycharmProjects\PycharmProjects\pythonProject\mobile_dataset_new
+train: images/train
+val: images/val
+
+#Keypoints
+kpt_shape: [4,3]
+flip_idx: [1,0,2,3]
+
+#classes
+names:
+  0: phone
