@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from typing import List, Tuple
 
 
-class Maths:
+class Calc:
     @staticmethod
     def is_approximately_on_straight_line(points: List[List[float]], angle_threshold: float = 10) -> bool:
         """
@@ -43,23 +43,54 @@ class Maths:
         # Calculate angles in degrees
         angles = np.degrees(np.arccos(cos_angles))
 
-        # Visualize results
-        plt.figure(figsize=(8, 6))
-        plt.scatter(points[:, 0], points[:, 1], color="red", label="Points", zorder=5)
-        plt.plot(points[:, 0], points[:, 1], 'b-', zorder=4)
-
         is_collinear = np.all(angles <= angle_threshold)
-        title = "Points are" + (" approximately" if is_collinear else " NOT approximately") + " on a straight line"
-        plt.title(title)
-        plt.show()
 
         # Print detailed analysis if needed
-        if angles.size > 0:
-            for i, angle in enumerate(angles, 1):
-                print(f"Angle {i}: {angle:.2f} degrees")
+        # if angles.size > 0:
+        #     for i, angle in enumerate(angles, 1):
+        #         print(f"Angle {i}: {angle:.2f} degrees")
 
-        print(title + ".")
         return is_collinear
+    @staticmethod
+    def calculate_total_distance(keypoints: List[List[float]], is_circular_distance: bool = False) -> float:
+        """
+        Calculate the total Euclidean distance between consecutive points using vectorized operations.
+
+        Args:
+            keypoints: List of points, where each point is [x, y]
+            is_circular_distance: If True, includes distance from last point back to first point
+
+        Returns:
+            float: Total distance between points
+
+        Example:
+            >>> points = [[0, 0], [3, 4], [6, 8]]
+            >>> calculate_total_distance(points)
+            10.0  # 5.0 (first segment) + 5.0 (second segment)
+            >>> calculate_total_distance(points, is_circular_distance=True)
+            18.0  # 10.0 + 8.0 (distance back to start)
+        """
+        if not keypoints or len(keypoints) < 2:
+            return 0.0
+
+        # Convert to numpy array for vectorized operations
+        points = np.array(keypoints)
+
+        # Calculate differences between consecutive points
+        diff = points[1:] - points[:-1]
+
+        # Calculate Euclidean distances in one operation
+        distances = np.sqrt(np.sum(diff ** 2, axis=1))
+
+        # Sum all distances
+        total = float(np.sum(distances))
+
+        # Add distance back to start if circular
+        if is_circular_distance:
+            circular_distance = np.sqrt(np.sum((points[0] - points[-1]) ** 2))
+            total += float(circular_distance)
+
+        return total
 
 
 if __name__ == "__main__":
@@ -69,4 +100,4 @@ if __name__ == "__main__":
                         [755.0282592773438, 808.4175415039062],
                         [657.451416015625, 1810.53759765625]]
 
-    Maths.is_approximately_on_straight_line(collinear_points)
+    Calc.is_approximately_on_straight_line(collinear_points)
